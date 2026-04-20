@@ -50,3 +50,8 @@ makes this explicit in the output, reinforcing the takeaway that the GCM tag
 *is* the integrity mechanism even when HMAC is off.
 
 <!-- Deliver the complete working project ready for GitHub publish. -->
+
+## SDLC
+
+These requirements are delivered under the family-wide Presidio SDLC:
+<https://github.com/presidio-v/presidio-hardened-docs/blob/main/sdlc/sdlc-report.md>.
