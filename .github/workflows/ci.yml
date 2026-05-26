@@ -1,10 +1,9 @@
 name: CI
 
+# Trigger on pushes and PRs for any branch so CI runs for feature branches.
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  push: {}
+  pull_request: {}
 
 permissions:
   contents: read
