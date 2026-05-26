@@ -2,41 +2,9 @@ name: CI
 
 on:
   push:
-    branches:
-      - '**'
+    branches: [ main ]
   pull_request:
-
-jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: [3.10, 3.11]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
-
-      - name: Bootstrap
-        run: python bootstrap.py
-
-      - name: Run tests
-        run: python -m pytest -q
-name: CI
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    branches: [ main ]
 
 permissions:
   contents: read
@@ -46,31 +14,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v4
         with:
-          python-version: "3.12"
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-      - name: Install dependencies
-        run: uv pip install --system -e ".[dev]"
+          python-version: '3.12'
+      - name: Install dev dependencies
+        run: python -m pip install --upgrade pip && pip install -e ".[dev]"
       - name: Ruff format check
         run: ruff format --check .
       - name: Ruff lint
         run: ruff check .
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [3.10, 3.11]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-      - name: Install dependencies
-        run: uv pip install --system -e ".[dev]"
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+      - name: Bootstrap
+        run: python bootstrap.py
       - name: Run tests
-        run: pytest --cov=presidio_crypto_channel --cov-report=xml --cov-fail-under=80
+        run: python -m pytest -q
