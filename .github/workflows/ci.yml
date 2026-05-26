@@ -13,11 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Install dev dependencies
-          run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
       - name: Ruff format check
         run: ruff format --check .
       - name: Ruff lint
@@ -35,12 +35,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
-        - name: Install runtime dependencies
-          run: |
-            python -m pip install --upgrade pip
-            python -m pip install -r requirements.txt
-            python -m pip install -e .
+      - name: Install runtime dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install -e .
       - name: Run tests
         run: python -m pytest -q
