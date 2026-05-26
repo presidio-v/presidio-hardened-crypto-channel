@@ -2,9 +2,12 @@
 
 Usage: python bootstrap.py
 """
+
+import contextlib
 import os
-import sys
 import subprocess
+import sys
+import venv
 from pathlib import Path
 
 # If the running interpreter is older than required, try to find and re-run
@@ -18,25 +21,22 @@ if sys.version_info < REQUIRED:
         candidates = [["python3.10"], ["python3"], ["python"]]
 
     for cmd in candidates:
-        try:
-            check = subprocess.run(cmd + ["-c", "import sys; print(sys.version_info[0], sys.version_info[1])"], capture_output=True, text=True)
+        with contextlib.suppress(Exception):
+            check = subprocess.run(  # noqa: S603
+                cmd + ["-c", "import sys; print(sys.version_info[0], sys.version_info[1])"],
+                capture_output=True,
+                text=True,
+            )
             out = check.stdout.strip().split()
             if len(out) >= 2:
                 major = int(out[0])
                 minor = int(out[1])
                 if (major, minor) >= REQUIRED:
                     # Re-exec the script with the found interpreter and same args
-                    try:
-                        os.execvp(cmd[0], cmd + sys.argv)
-                    except Exception:
-                        # fall through to try other candidates
-                        pass
-        except Exception:
-            continue
+                    with contextlib.suppress(Exception):
+                        os.execvp(cmd[0], cmd + sys.argv)  # noqa: S606
 
-    print("bootstrap: no suitable Python 3.10+ interpreter found; please run with a Python 3.10+ (e.g. 'py -3.10' or 'python3')", file=sys.stderr)
-
-import venv
+    print("bootstrap: no suitable Python 3.10+ interpreter found", file=sys.stderr)
 
 ROOT = Path(__file__).parent.resolve()
 VENV_DIR = ROOT / ".venv"
@@ -51,7 +51,7 @@ def venv_python() -> Path:
 def run(cmd, **kwargs):
     # keep output concise and avoid typing generics for older interpreters
     print("bootstrap: running:", " ".join(cmd))
-    return subprocess.run(cmd, **kwargs).returncode
+    return subprocess.run(cmd, **kwargs).returncode  # noqa: S603
 
 
 def create_venv() -> None:
@@ -93,9 +93,6 @@ def print_next_steps() -> None:
 
 
 def main() -> None:
-    if sys.version_info < (3, 10):
-        print("Requires Python 3.10+")
-
     create_venv()
     install_requirements()
     print_next_steps()
