@@ -2,9 +2,32 @@
 
 from __future__ import annotations
 
+import os
+import sys
+from pathlib import Path
+
+# Auto-execute inside the virtual environment if running globally
+try:
+    import presidio_crypto_channel  # noqa: F401
+except ImportError:
+    venv_dir = Path(__file__).parent.resolve() / ".venv"
+    venv_py = (
+        venv_dir / "Scripts" / "python.exe" if os.name == "nt" else venv_dir / "bin" / "python"
+    )
+    if (
+        venv_py.exists()
+        and sys.executable != str(venv_py)
+        and os.environ.get("__VENV_LAUNCHED__") != "1"
+    ):
+        import subprocess
+
+        env = os.environ.copy()
+        env["__VENV_LAUNCHED__"] = "1"
+        sys.exit(subprocess.call([str(venv_py)] + sys.argv, env=env))  # noqa: S603
+
+
 import argparse
 import json
-import sys
 
 
 def cmd_keyexchange(args: argparse.Namespace) -> None:

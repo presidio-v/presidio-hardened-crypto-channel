@@ -1,9 +1,16 @@
+# Note: Fixed configuration to install package with "[dev]" extras so that
+# pytest runs correctly in both CI and local dev environments.
+
 name: CI
 
-# Trigger on pushes and PRs for any branch so CI runs for feature branches.
 on:
-  push: {}
-  pull_request: {}
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
 
 permissions:
   contents: read
@@ -13,9 +20,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      # Install dev extras so ruff/pytest are available
       - name: Install dev dependencies
         run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
       - name: Ruff format check
@@ -35,6 +44,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      # Install with dev extras so pytest is available on all platforms
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -42,5 +52,3 @@ jobs:
       - name: Run tests
         run: |
           python -m pytest
-
-

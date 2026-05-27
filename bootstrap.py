@@ -77,7 +77,8 @@ def install_requirements() -> None:
     if req.exists():
         run([py, "-m", "pip", "install", "-r", str(req)], check=True)
 
-    # install package editable so imports work
+    # Install editable package with [dev] extras so pytest is available locally
+
     run([py, "-m", "pip", "install", "-e", f"{ROOT}[dev]"], check=True)
 
 

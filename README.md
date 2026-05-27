@@ -18,8 +18,7 @@ the included helper:
 python bootstrap.py
 ```
 
-After bootstrapping, run experiments from the "Experiments" section one at a
-time.
+Once bootstrapped, you can run all experiments directly from the "Experiments" section one at a time (the scripts will automatically run inside the virtual environment under the hood).
 
 
 
