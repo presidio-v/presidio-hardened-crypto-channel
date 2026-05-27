@@ -28,50 +28,19 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.10', '3.11']
+        python-version: ['3.10', '3.11', '3.12']
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install runtime dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
-          python -m pip install -e .
-      - name: Run tests (produce junit)
+          python -m pip install -e ".[dev]"
+      - name: Run tests
         run: |
-          python -m pytest -q --junitxml=test-results.xml
-        continue-on-error: false
+          python -m pytest
 
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: test-results.xml
 
-  report-failure:
-    needs: test
-    if: needs.test.result == 'failure'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: test-results
-          path: ./artifacts
-      - name: Create issue with test output
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const xml = fs.readFileSync('artifacts/test-results.xml', 'utf8');
-            const body = `Automated CI failure on branch ${process.env.GITHUB_REF}\n\n<details><summary>Test results (junit xml)</summary>\n\n\n\n\n\n\n\n\n\n\n\n</details>\n\n\n\n\n\n\n\n\n---\n\n\n\n`;
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `CI failure: ${process.env.GITHUB_REF}`,
-              body: xml.slice(0, 10000)
-            });

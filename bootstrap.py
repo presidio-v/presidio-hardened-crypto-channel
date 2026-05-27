@@ -78,7 +78,7 @@ def install_requirements() -> None:
         run([py, "-m", "pip", "install", "-r", str(req)], check=True)
 
     # install package editable so imports work
-    run([py, "-m", "pip", "install", "-e", str(ROOT)], check=True)
+    run([py, "-m", "pip", "install", "-e", f"{ROOT}[dev]"], check=True)
 
 
 def write_wrappers() -> None:
