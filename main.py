@@ -4,26 +4,27 @@ from __future__ import annotations
 
 import os
 import sys
-from pathlib import Path
 
-# Auto-execute inside the virtual environment if running globally
+# Added this block to auto-run inside the local .venv.
+# On Windows, I couldn't activate the virtualenv in PowerShell due to execution
+# policies, so this automatically launches the script in the venv.
 try:
-    import presidio_crypto_channel  # noqa: F401
+    import presidio_crypto_channel  # noqa: F401 - ignore unused import
 except ImportError:
-    venv_dir = Path(__file__).parent.resolve() / ".venv"
-    venv_py = (
-        venv_dir / "Scripts" / "python.exe" if os.name == "nt" else venv_dir / "bin" / "python"
-    )
-    if (
-        venv_py.exists()
-        and sys.executable != str(venv_py)
-        and os.environ.get("__VENV_LAUNCHED__") != "1"
-    ):
-        import subprocess
+    # don't re-run to avoid infinite loops
+    if ".venv" not in sys.executable:
+        from pathlib import Path
 
-        env = os.environ.copy()
-        env["__VENV_LAUNCHED__"] = "1"
-        sys.exit(subprocess.call([str(venv_py)] + sys.argv, env=env))  # noqa: S603
+        subdir = "Scripts/python.exe" if os.name == "nt" else "bin/python"
+        venv_py = Path(__file__).parent / ".venv" / subdir
+        if venv_py.exists():
+            import subprocess
+
+            sys.exit(subprocess.call([str(venv_py)] + sys.argv))  # noqa: S603 - runs using the venv
+
+    print("Error: presidio-hardened-crypto-channel is not installed.", file=sys.stderr)
+    print("Please run 'python bootstrap.py' first to set up the project.", file=sys.stderr)
+    sys.exit(1)
 
 
 import argparse
