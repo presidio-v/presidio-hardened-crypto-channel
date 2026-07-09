@@ -1,11 +1,11 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "tomli; python_version < '3.11'"]
 build-backend = "hatchling.build"
 
 [project]
 name = "presidio-hardened-crypto-channel"
 version = "0.1.0"
-description = "Secure cryptographic channel demonstrating ECDH, AES-256-GCM, and HMAC integrity"
+description = "Secure cryptographic channel demonstrating ECDH, AES-256-GCM, and HMAC integrity. Independent of Microsoft Presidio (a data-anonymization toolkit)."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
