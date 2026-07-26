@@ -18,10 +18,19 @@ the included helper:
 python bootstrap.py
 ```
 
-Once bootstrapped, you can run all experiments directly from the "Experiments" section one at a time (the scripts will automatically run inside the virtual environment under the hood).
+Activation is optional. Run commands through the virtual environment interpreter
+directly if shell policy prevents activation:
 
+```bash
+# macOS or Linux
+.venv/bin/python main.py --demo keyexchange --parties Alice Bob
 
+# Windows PowerShell
+.\.venv\Scripts\python.exe main.py --demo keyexchange --parties Alice Bob
+```
 
+For the experiments below, use the virtual environment interpreter in place of
+`python` when the environment is not activated.
 
 ## Experiments
 

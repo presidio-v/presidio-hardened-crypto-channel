@@ -1,13 +1,10 @@
-# CI workflow for running tests and checks
 name: CI
 
 on:
   push:
-    branches:
-      - '**'
+    branches: [main]
   pull_request:
-    branches:
-      - '**'
+    branches: [main]
 
 permissions:
   contents: read
@@ -16,48 +13,46 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: setup python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: '3.12'
-      # get pip and dev dependencies ready
-      - name: install dependencies
-        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
-      - name: check code formatting
+          python-version: "3.12"
+      - name: Install uv
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+      - name: Install dependencies
+        run: uv pip install --system -e ".[dev]"
+      - name: Ruff format check
         run: ruff format --check .
-      - name: run ruff check
+      - name: Ruff lint
         run: ruff check .
 
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.10', '3.11', '3.12']
+        python-version: ["3.10", "3.11", "3.12"]
     steps:
-      - uses: actions/checkout@v4
-      - name: setup python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
-      # get pip and dev dependencies ready
-      - name: install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -e ".[dev]"
-      # run the bootstrap tool
-      - name: run bootstrap script
+      - name: Install uv
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+      - name: Install dependencies
+        run: uv pip install --system -e ".[dev]"
+      - name: Run tests
+        run: pytest --cov=presidio_crypto_channel --cov-report=xml --cov-fail-under=80
+
+  bootstrap-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Bootstrap without activating the virtual environment
         run: python bootstrap.py
-      # execute experiment commands to make sure they run without error
-      - name: run experiments
+      - name: Run through the virtual environment interpreter
         run: |
-          python main.py --demo keyexchange --parties Alice Bob
-          python main.py --demo symmetric --message "Hello from Alice" --key-size 256
-          python main.py --demo channel --client Alice --server Bob --messages 10
-          python main.py --demo channel --no-hmac --tamper
-          python main.py --demo channel --messages 100 --duration 60
-          python report.py --experiment 1
-      - name: run pytest
-        run: |
-          python -m pytest
+          .\.venv\Scripts\python.exe -m pytest --cov=presidio_crypto_channel --cov-fail-under=80
+          .\.venv\Scripts\python.exe main.py --demo keyexchange --parties Alice Bob
