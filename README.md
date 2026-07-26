@@ -9,8 +9,28 @@ PRES-EDU-SEC-101 — Computer Security.
 ```bash
 git clone https://github.com/presidio-v/presidio-hardened-crypto-channel.git
 cd presidio-hardened-crypto-channel
-pip install -r requirements.txt
 ```
+
+Recommended: create a local virtual environment and install dependencies with
+the included helper:
+
+```bash
+python bootstrap.py
+```
+
+Activation is optional. Run commands through the virtual environment interpreter
+directly if shell policy prevents activation:
+
+```bash
+# macOS or Linux
+.venv/bin/python main.py --demo keyexchange --parties Alice Bob
+
+# Windows PowerShell
+.\.venv\Scripts\python.exe main.py --demo keyexchange --parties Alice Bob
+```
+
+For the experiments below, use the virtual environment interpreter in place of
+`python` when the environment is not activated.
 
 ## Experiments
 

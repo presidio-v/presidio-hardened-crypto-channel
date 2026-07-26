@@ -42,3 +42,17 @@ jobs:
         run: uv pip install --system -e ".[dev]"
       - name: Run tests
         run: pytest --cov=presidio_crypto_channel --cov-report=xml --cov-fail-under=80
+
+  bootstrap-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Bootstrap without activating the virtual environment
+        run: python bootstrap.py
+      - name: Run through the virtual environment interpreter
+        run: |
+          .\.venv\Scripts\python.exe -m pytest --cov=presidio_crypto_channel --cov-fail-under=80
+          .\.venv\Scripts\python.exe main.py --demo keyexchange --parties Alice Bob
