@@ -19,3 +19,14 @@ updates:
     labels:
       - dependencies
       - ci
+    # Multi-action repos (github/codeql-action exposes init, autobuild and
+    # analyze) must move together: a per-action PR leaves the workflow at
+    # mixed versions until the last one merges. Group by source repo so one
+    # upstream release yields one reviewable PR.
+    groups:
+      codeql-action:
+        patterns:
+          - "github/codeql-action*"
+      actions-toolkit:
+        patterns:
+          - "actions/*"
