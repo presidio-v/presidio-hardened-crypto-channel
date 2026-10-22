@@ -29,7 +29,7 @@ within 30 days of a confirmed vulnerability.
 | **AES-256-GCM** | Authenticated encryption — confidentiality and integrity in one primitive |
 | **HMAC-SHA256** | Explicit integrity layer over nonce + ciphertext |
 | **No weak primitives** | No MD5, SHA-1, DES, RSA, or CBC mode anywhere in the stack |
-| **Dependency audit** | `pip-audit` runs on import to detect known-vulnerable dependencies |
+| **Dependency audit** | `pip-audit` runs on import to detect known-vulnerable dependencies; blocking `pip-audit` in CI on every PR and push to `main` |
 | **Security logging** | Structured events for all key exchange and channel operations |
 
 ## Dependency Management
